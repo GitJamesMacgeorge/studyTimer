@@ -3,12 +3,42 @@ package main
 import (
     "fmt"
     "strings"
+    "os"
 )
 
-func handleOptionInput(user_input) {
+func promptUser(request string, expected_answer []string) string {
+   
+    for true {
+        fmt.Printf("\n%s", request)
+        var user_reply string
+        fmt.Scan(&user_reply)
+        result_con := false
+
+        // Print Request 
+       
+        for i := 0; i < len(expected_answer); i++ {
+            if(strings.ToLower(strings.TrimSpace(user_reply)) == expected_answer[i] && !result_con) {
+                result_con = true
+                break
+            }
+        }
+
+        if(result_con) {
+            return strings.ToLower(strings.TrimSpace(user_reply))
+        }
+
+        return "failed"
+
+    }
+    return "failed"
+}
+
+
+func handleOptionInput(session_history []Session, user_input string, study_length_mins int, break_length_mins int) {
     switch {
         case strings.TrimSpace(user_input) == "1":
-            startStudySession()
+            session := startStudySession(study_length_mins, break_length_mins)
+            saveSession(HISTORY_PATH, session_history, session)
     }
 }
 
@@ -37,7 +67,11 @@ func menu() {
         var user_input string 
         fmt.Println("Enter Option: ")
         fmt.Scan(&user_input)
-        handleOptionInput(user_input)
+
+        // Handle User Input 
+        //study_length_mins := 50
+        //break_length_mins := 10
+        //handleOptionInput(user_input, study_length_mins, break_length_mins)
     }
 
 }
@@ -48,5 +82,21 @@ func welcome() {
 }
 
 func main() {
+    // Retrieve History
+    session_history := retrieveSessions(HISTORY_PATH)
     welcome()
+    result := loadOption(0, true)
+    if(result == "failed") {
+        fmt.Println("LoadOption failed")
+        os.Exit(3)
     }
+    fmt.Println(result)
+
+    user_reply := promptUser("Enter Option: ", []string{"1", "2", "3", "4"})
+    if(user_reply == "failed") {
+        fmt.Println("promptUser failed")
+        os.Exit(3)
+    }
+
+    handleOptionInput(session_history, user_reply, 1, 10)
+}
