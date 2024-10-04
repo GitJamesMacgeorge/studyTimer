@@ -6,18 +6,31 @@ import (
     "strings"
 )
 
+func timer(length_mins int) {
+    start_time := time.Now()
+    fmt.Printf("\n[")
+    for {
+        elapsed := time.Since(start_time)
+        seconds := elapsed.Seconds()
+        remaining := length_mins - int(seconds / 60)
+        if(((length_mins * 60) - int(seconds)) % 60 == 0) && (remaining != 1) {
+            fmt.Printf("#")
+        }
+
+        if(remaining == 0) {
+            fmt.Printf("]\n")
+            break
+        }
+        time.Sleep(1 * time.Second)
+    }
+}
+
 func commenceStudyTimer(length_mins int) bool {
-    fmt.Println("The timer has started")
     // Set Duration & Create Timer
-    duration := time.Duration(length_mins) * time.Minute
-    timer := time.NewTimer(duration)
-    
-    // Waits for the timer to expire
-    <-timer.C
+    timer(length_mins)
     fmt.Println("The timer has finished.")
     return true
 }
-
 
 func showDetails(study_length_mins int, break_length_mins int) bool {
     // Displays the Details of the study session before commencement

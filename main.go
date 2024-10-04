@@ -39,6 +39,8 @@ func handleOptionInput(session_history []Session, user_input string, study_lengt
         case strings.TrimSpace(user_input) == "1":
             session := startStudySession(study_length_mins, break_length_mins)
             saveSession(HISTORY_PATH, session_history, session)
+        case strings.TrimSpace(user_input) == "2":
+            displayHistory(session_history)
     }
 }
 
@@ -61,21 +63,6 @@ func loadOption(option_number int, show_all bool) string {
     return "failed"
 }
 
-func menu() {
-    fmt.Println(loadOption(0, true))
-    for(true) {
-        var user_input string 
-        fmt.Println("Enter Option: ")
-        fmt.Scan(&user_input)
-
-        // Handle User Input 
-        //study_length_mins := 50
-        //break_length_mins := 10
-        //handleOptionInput(user_input, study_length_mins, break_length_mins)
-    }
-
-}
-
 func welcome() {
     // Show welcome message
     fmt.Println("Welcome")
@@ -92,11 +79,18 @@ func main() {
     }
     fmt.Println(result)
 
-    user_reply := promptUser("Enter Option: ", []string{"1", "2", "3", "4"})
-    if(user_reply == "failed") {
-        fmt.Println("promptUser failed")
-        os.Exit(3)
-    }
+    condition := true
+    for condition {
+        user_reply := promptUser("Enter Option: ", []string{"1", "2", "3", "4"})
+        if(user_reply == "failed") {
+            fmt.Println("promptUser failed")
+            os.Exit(3)
+        }
+        // Exit app
+        if(strings.TrimSpace(user_reply) == "4") {
+            os.Exit(3)
+        }
 
-    handleOptionInput(session_history, user_reply, 1, 10)
+        handleOptionInput(session_history, user_reply, 1, 1)
+    }
 }

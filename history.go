@@ -15,11 +15,13 @@ type Session struct {
 
 func saveSession(filepath string, session_history []Session, session Session) { 
     // Saves a sesson to the json file
-    file, err := os.Open(filepath)
+    file, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
     if(err != nil) {
         fmt.Println("Failed to open json file for encoding")
         return
     }
+
+    defer file.Close()
 
     // Add session to history 
     session_history = append(session_history, session)
@@ -28,15 +30,17 @@ func saveSession(filepath string, session_history []Session, session Session) {
     writeData, err := json.MarshalIndent(session_history, "", " ")
 
     // Write json data into history file 
-    err = file.Truncate(0)
+    err = os.Truncate(filepath, 0) 
     if(err != nil) {
         fmt.Println("Failed to truncate json file")
+        fmt.Println(err)
         return
     }
 
     _, err = file.Write(writeData)
     if(err != nil) {
         fmt.Println("Failed to write data to json file")
+        fmt.Println(err)
         return
     }
 
@@ -45,8 +49,6 @@ func saveSession(filepath string, session_history []Session, session Session) {
 
 func retrieveSessions(filepath string) []Session {
     // Check if file exists
-    
-
     file, err := os.Open(filepath)
     if(err != nil) {
         fmt.Println("Failed to open json file for decoding")
@@ -70,10 +72,19 @@ func retrieveSessions(filepath string) []Session {
         fmt.Println(err)
         return nil
     }
-    fmt.Println(string(byte_value))
-    fmt.Println(session_history[0])
+
     if(len(session_history) == 1) {
         fmt.Println("yes")
     }
+
     return session_history
+}
+
+func displayHistory(session_history []Session) {
+    for index, value := range session_history {
+        fmt.Printf("Session ID: %d\n", index)
+        fmt.Printf("Session Date: %s\n", value.Date)
+        fmt.Printf("Study Minutes: %d\n", value.StudyMinutes)
+        fmt.Printf("Break Minutes: %d\n\n", value.BreakMinutes)
+    }
 }
