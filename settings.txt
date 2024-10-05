@@ -1,0 +1,2 @@
+studylength=50
+breaklength=10

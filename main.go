@@ -7,12 +7,17 @@ import (
 )
 
 func promptUser(request string, expected_answer []string) string {
-   
+
     for true {
         fmt.Printf("\n%s", request)
         var user_reply string
         fmt.Scan(&user_reply)
         result_con := false
+
+        // Handle if expected answer is nil
+        if(expected_answer == nil) {
+            return strings.ToLower(strings.TrimSpace(user_reply))
+        }
 
         // Print Request 
        
@@ -41,6 +46,8 @@ func handleOptionInput(session_history []Session, user_input string, study_lengt
             saveSession(HISTORY_PATH, session_history, session)
         case strings.TrimSpace(user_input) == "2":
             displayHistory(session_history)
+        case strings.TrimSpace(strings.ToLower(user_input)) == "3":
+            displaySettings(&study_length_mins, &break_length_mins)
     }
 }
 
@@ -69,6 +76,9 @@ func welcome() {
 }
 
 func main() {
+    // Retrieve Settings 
+    settings_map := extractSettings(SETTINGS_PATH)
+
     // Retrieve History
     session_history := retrieveSessions(HISTORY_PATH)
     welcome()
@@ -91,6 +101,6 @@ func main() {
             os.Exit(3)
         }
 
-        handleOptionInput(session_history, user_reply, 1, 1)
+        handleOptionInput(session_history, user_reply, settings_map["studyTime"], settings_map["breakTime"])
     }
 }
